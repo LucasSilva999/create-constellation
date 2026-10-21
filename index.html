@@ -15,9 +15,11 @@ fieldset{margin:15px 0 0;border:1px solid #34516c;border-radius:10px;padding:12p
 .step{border-top:1px solid var(--line);margin-top:14px;padding-top:13px;color:var(--soft);font-size:13px}.step strong{color:white}.foot{font-size:12px;color:var(--soft);margin-top:18px}
 .export{margin-top:18px}.export h2{margin:0 0 4px}.export p{color:var(--soft);margin:5px 0 11px;font-size:13px}textarea{min-height:235px;resize:vertical;font:12px/1.65 Consolas,monospace;white-space:pre}
 .notice{margin:12px 0 0;color:var(--gold);font-size:12px;min-height:18px}.check{color:var(--soft);font-size:13px;white-space:nowrap} .check input{accent-color:var(--accent)}
+.modehint{display:flex;align-items:center;gap:10px;margin:0 0 12px;padding:10px 13px;border:1px solid #365879;border-radius:10px;background:linear-gradient(105deg,#153456,#10243f);color:#dcefff;font-size:13px;min-height:44px}.modehint .hintIcon{font-size:20px;color:#ffdb91}.modehint.connect{border-color:#728ab0;background:linear-gradient(105deg,#273c60,#132d4b)}.canvasbox:has(canvas){position:relative}canvas.drag-connect{cursor:crosshair}canvas.drag-point{cursor:grab}canvas.dragging-point{cursor:grabbing}
+#limparlinhas{color:#ffd99f}
 @media(max-width:850px){main{display:flex;flex-direction:column}.panel{width:100%}main{padding:0 12px 20px}header{padding:17px 16px}.tools .tip{flex-basis:100%;text-align:left} }
 </style></head>
-<body><header><h1>✦ Editor visual de constelações</h1><p>Arraste as estrelas e ligue os pontos. Depois copie o código pronto para seu jogo <b>Word!</b> no GameMaker.</p></header>
+<body><header><h1>✦ Editor visual de constelações</h1><p>Posicione as estrelas e desenhe as ligações arrastando de uma para outra. Depois copie o código pronto para seu jogo <b>Word!</b> no GameMaker.</p></header>
 <main><section class="panel"><h2>1. Escolha a fase</h2>
 <div class="field"><label for="fase">Desenho para editar</label><select id="fase"></select></div>
 <div class="btnrow"><button id="novo" class="primary">+ Novo desenho</button><button id="exemplo">Exemplo: CASA</button></div>
@@ -25,16 +27,16 @@ fieldset{margin:15px 0 0;border:1px solid #34516c;border-radius:10px;padding:12p
 <div class="field"><label for="nome">Nome exibido</label><input id="nome" type="text" placeholder="Ex.: CASA"></div>
 <div class="field"><label for="subtitulo">Frase abaixo da imagem</label><input id="subtitulo" type="text" placeholder="Ex.: UMA CASA DE ESTRELAS"></div>
 <fieldset><legend>Estrela selecionada</legend>
-<p id="selecionada">Clique em uma estrela para ajustar seu brilho.</p>
+<p id="selecionada">Selecione uma estrela para ajustar seu brilho.</p>
 <label class="label" for="brilho">Tamanho / brilho: <span id="valorBrilho">1,5</span></label><input id="brilho" type="range" min="0.5" max="3" step="0.1" value="1.5" disabled>
 </fieldset>
-<div class="step"><strong>Como editar:</strong> use <b>Mover</b> para arrastar estrelas, <b>Adicionar</b> para criar pontos, <b>Ligar</b> para clicar em duas estrelas e traçar uma linha, e <b>Apagar</b> para remover uma estrela ou linha.</div>
+<div class="step"><strong>Como editar:</strong> use <b>Adicionar</b> para colocar as estrelas e <b>Mover</b> para ajustar as posições. Depois escolha <b>Conectar</b>: pressione em uma estrela, arraste até a próxima e solte. Você também pode continuar arrastando por várias estrelas de uma vez, criando uma sequência de linhas. Use <b>Apagar</b> para remover estrelas ou linhas.</div>
 <div class="step"><strong>IMPORTANTE:</strong> esta página funciona localmente, sem internet, mas <b>não altera o GameMaker sozinha</b>. Use <b>Gerar código GML</b> e cole no script do projeto. Para continuar editando em outro dia, salve seu desenho em JSON.</div>
 <p class="foot">Dica: comece pelos pontos do contorno, conecte-os e depois adicione detalhes internos. O jogo anima tudo automaticamente.</p>
 </section>
 <section class="panel workspace"><div class="tools">
-<button class="active" data-mode="mover">↔ Mover</button><button data-mode="adicionar">✦ Adicionar</button><button data-mode="conectar">╱ Ligar</button><button data-mode="apagar">⌫ Apagar</button><button id="desfazer">↶ Desfazer</button><label class="check"><input type="checkbox" id="numeros" checked> Números</label><div class="tip" id="contagem"></div>
-</div><div class="canvasbox"><canvas id="tela" width="900" height="600" aria-label="Editor visual interativo das estrelas e suas ligações"></canvas></div><div id="info">As coordenadas variam de 0,00 a 1,00.</div>
+<button class="active" data-mode="mover" title="Arraste os pontos para mudar a posição">↔ Mover</button><button data-mode="adicionar" title="Clique no céu para criar estrelas">✦ Adicionar</button><button data-mode="conectar" title="Pressione em uma estrela e arraste até as outras">╱ Conectar arrastando</button><button data-mode="apagar" title="Clique em estrelas ou linhas para apagar">⌫ Apagar</button><button id="desfazer" title="Desfazer a última edição">↶ Desfazer</button><button id="limparlinhas" title="Apaga somente as linhas, mantendo todos os pontos">Limpar linhas</button><label class="check"><input type="checkbox" id="numeros" checked> Números</label><div class="tip" id="contagem"></div>
+</div><div id="dicaModo" class="modehint" role="status" aria-live="polite"><span class="hintIcon">✦</span><span>Use Adicionar para colocar pontos e Mover para posicioná-los.</span></div><div class="canvasbox"><canvas id="tela" width="900" height="600" aria-label="Editor visual interativo das estrelas e suas ligações"></canvas></div><div id="info">As coordenadas variam de 0,00 a 1,00.</div>
 <div class="export"><h2>2. Gere o código e salve seu desenho</h2><p>O GML abaixo substitui ou cria o <code>case "PALAVRA":</code> no script <code>Constelacoes_Finais.gml</code>.</p>
 <div class="btnrow"><button id="gerar" class="primary">Gerar código GML</button><button id="copiar">Copiar código</button><button id="baixargml">Baixar .txt com GML</button></div>
 <div class="field"><textarea id="codigo" spellcheck="false" aria-label="Código GML gerado"></textarea></div>
@@ -51,41 +53,131 @@ const exemploCasa={palavra:'CASA',nome:'CASA',subtitulo:'UM LAR DESENHADO NAS ES
 const $=id=>document.getElementById(id);
 const canvas=$('tela'),ctx=canvas.getContext('2d'),R={x:79,y:75,w:742,h:443};
 let escolhido=0,modo='mover',sel=-1,primeiro=-1,arrastando=false,historico=[];
+let conectando=false, posCursor=null, cursorAnterior=null, hover=-1, linhasNovas=0, historicoArrasto=false, ponteiroAtivo=null;
 const fase=$('fase'),palavra=$('palavra'),nome=$('nome'),subtitulo=$('subtitulo'),brilho=$('brilho'),vBrilho=$('valorBrilho'),info=$('info'),msg=$('mensagem'),codigo=$('codigo');
 let data=()=>desenhos[escolhido];
 function clamp(n,a,b){return Math.max(a,Math.min(b,n))}
 function clone(o){return JSON.parse(JSON.stringify(o))}
 function asciiPalavra(t){return String(t).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toUpperCase().replace(/[^A-Z]/g,'')}
 function atualizaFases(){const atual=escolhido;fase.innerHTML='';desenhos.forEach((d,i)=>{const opt=document.createElement('option');opt.value=String(i);opt.textContent=d.palavra+' — '+d.nome;fase.appendChild(opt)});fase.value=String(atual)}
-function carregarCampos(){const d=data();atualizaFases();palavra.value=d.palavra;nome.value=d.nome;subtitulo.value=d.subtitulo;sel=-1;primeiro=-1;historico=[];atualizaBrilho();render();gerarGML()}
+function carregarCampos(){const d=data();atualizaFases();palavra.value=d.palavra;nome.value=d.nome;subtitulo.value=d.subtitulo;sel=-1;primeiro=-1;historico=[];encerrarInteracao();atualizaBrilho();render();gerarGML()}
 function notificar(t){msg.textContent=t}
 function salvarHistorico(){historico.push(clone(data()));if(historico.length>50)historico.shift()}
 function atualizaBrilho(){const d=data();const p=d.pontos[sel];$('selecionada').textContent=p?'Ponto '+sel+' | x '+p[0].toFixed(3)+' | y '+p[1].toFixed(3):'Clique em uma estrela para selecioná-la.';brilho.disabled=!p;if(p){brilho.value=p[2];vBrilho.textContent=Number(p[2]).toFixed(1).replace('.',',')}else{vBrilho.textContent='—'}}
 function coordenadas(e){const rect=canvas.getBoundingClientRect();const scaleX=canvas.width/rect.width,scaleY=canvas.height/rect.height;return {x:(e.clientX-rect.left)*scaleX,y:(e.clientY-rect.top)*scaleY}}
 function normalizar(pos){return [clamp((pos.x-R.x)/R.w,0,1),clamp((pos.y-R.y)/R.h,0,1)]}
 function px(p){return [R.x+p[0]*R.w,R.y+p[1]*R.h]}
-function pertoPonto(pos){let hit=-1,dist=20;data().pontos.forEach((p,i)=>{const [x,y]=px(p);const d=Math.hypot(pos.x-x,pos.y-y);if(d<dist){dist=d;hit=i}});return hit}
+function raioAlvo(){return Math.max(20,18*canvas.width/canvas.getBoundingClientRect().width)}
+function pertoPonto(pos){let hit=-1,dist=raioAlvo();data().pontos.forEach((p,i)=>{const [x,y]=px(p);const d=Math.hypot(pos.x-x,pos.y-y);if(d<dist){dist=d;hit=i}});return hit}
 function distSegmento(px,py,x1,y1,x2,y2){const dx=x2-x1,dy=y2-y1,q=dx*dx+dy*dy;const t=q?clamp(((px-x1)*dx+(py-y1)*dy)/q,0,1):0;return Math.hypot(px-(x1+t*dx),py-(y1+t*dy))}
-function pertoLinha(pos){let hit=-1,dist=9;data().linhas.forEach((l,i)=>{const a=px(data().pontos[l[0]]),b=px(data().pontos[l[1]]);const d=distSegmento(pos.x,pos.y,a[0],a[1],b[0],b[1]);if(d<dist){dist=d;hit=i}});return hit}
+function pertoLinha(pos){let hit=-1,dist=Math.max(9,10*canvas.width/canvas.getBoundingClientRect().width);data().linhas.forEach((l,i)=>{const a=px(data().pontos[l[0]]),b=px(data().pontos[l[1]]);const d=distSegmento(pos.x,pos.y,a[0],a[1],b[0],b[1]);if(d<dist){dist=d;hit=i}});return hit}
 function arredondar(n){return Math.round(n*1000)/1000}
 function desenharCanvas(){const w=canvas.width,h=canvas.height;ctx.clearRect(0,0,w,h);const g=ctx.createLinearGradient(0,0,w,h);g.addColorStop(0,'#0d2745');g.addColorStop(.6,'#07172f');g.addColorStop(1,'#0b1a32');ctx.fillStyle=g;ctx.fillRect(0,0,w,h);
  for(let i=0;i<95;i++){const x=(i*389+117)%w,y=(i*277+183)%h;ctx.fillStyle='rgba(151,215,255,'+(.14+.15*Math.sin(i+2)**2)+')';ctx.beginPath();ctx.arc(x,y,i%11===0?1.8:1,0,Math.PI*2);ctx.fill()}
  ctx.fillStyle='#142b46';ctx.globalAlpha=.48;ctx.fillRect(R.x,R.y,R.w,R.h);ctx.globalAlpha=1;ctx.strokeStyle='#375571';ctx.strokeRect(R.x,R.y,R.w,R.h);
  ctx.save();ctx.strokeStyle='rgba(115,169,211,.09)';ctx.setLineDash([5,9]);for(let i=1;i<10;i++){let x=R.x+R.w*i/10;ctx.beginPath();ctx.moveTo(x,R.y);ctx.lineTo(x,R.y+R.h);ctx.stroke()}for(let j=1;j<10;j++){let y=R.y+R.h*j/10;ctx.beginPath();ctx.moveTo(R.x,y);ctx.lineTo(R.x+R.w,y);ctx.stroke()}ctx.restore();
  const d=data();ctx.lineCap='round';d.linhas.forEach((l,i)=>{const a=px(d.pontos[l[0]]),b=px(d.pontos[l[1]]);ctx.strokeStyle='rgba(33,126,196,.29)';ctx.lineWidth=9;ctx.beginPath();ctx.moveTo(...a);ctx.lineTo(...b);ctx.stroke();ctx.strokeStyle='#87d6fc';ctx.lineWidth=2.3;ctx.stroke();});
- d.pontos.forEach((p,i)=>{const [x,y]=px(p),radius=3.3*p[2];const glow=ctx.createRadialGradient(x,y,0,x,y,radius*4);glow.addColorStop(0,'rgba(255,244,203,.45)');glow.addColorStop(1,'rgba(76,181,252,0)');ctx.fillStyle=glow;ctx.beginPath();ctx.arc(x,y,radius*4,0,Math.PI*2);ctx.fill();ctx.fillStyle='#ffe1a1';ctx.beginPath();ctx.arc(x,y,radius,0,Math.PI*2);ctx.fill();ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(x,y,Math.max(1,1.25*p[2]),0,Math.PI*2);ctx.fill();if(i===sel||i===primeiro){ctx.strokeStyle=i===primeiro?'#ffd78d':'#7fe2ff';ctx.lineWidth=2;ctx.beginPath();ctx.arc(x,y,15,0,Math.PI*2);ctx.stroke()}if($('numeros').checked){ctx.font='bold 14px system-ui';ctx.fillStyle='#b9dfff';ctx.fillText(String(i),x+10,y-11)}});
- if(primeiro>=0){ctx.fillStyle='#ffdda6';ctx.font='bold 15px system-ui';ctx.fillText('Clique na 2ª estrela para conectar',R.x+10,R.y+25)}
+ if(conectando && primeiro>=0 && posCursor){
+   const a=px(d.pontos[primeiro]), dest=(hover>=0&&hover!==primeiro)?px(d.pontos[hover]):[posCursor.x,posCursor.y];
+   ctx.save();ctx.setLineDash([9,7]);ctx.lineWidth=3;ctx.strokeStyle='#ffdc92';ctx.shadowBlur=13;ctx.shadowColor='#facc77';
+   ctx.beginPath();ctx.moveTo(...a);ctx.lineTo(...dest);ctx.stroke();ctx.restore();
+ }
+ d.pontos.forEach((p,i)=>{const [x,y]=px(p),radius=3.3*p[2];const glow=ctx.createRadialGradient(x,y,0,x,y,radius*4);glow.addColorStop(0,'rgba(255,244,203,.45)');glow.addColorStop(1,'rgba(76,181,252,0)');ctx.fillStyle=glow;ctx.beginPath();ctx.arc(x,y,radius*4,0,Math.PI*2);ctx.fill();ctx.fillStyle='#ffe1a1';ctx.beginPath();ctx.arc(x,y,radius,0,Math.PI*2);ctx.fill();ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(x,y,Math.max(1,1.25*p[2]),0,Math.PI*2);ctx.fill();if(i===sel||i===primeiro||(conectando&&hover===i)){ctx.strokeStyle=i===primeiro?'#ffd78d':conectando&&hover===i?'#9effcc':'#7fe2ff';ctx.lineWidth=conectando&&hover===i?3:2;ctx.beginPath();ctx.arc(x,y,conectando&&hover===i?18:15,0,Math.PI*2);ctx.stroke()}if($('numeros').checked){ctx.font='bold 14px system-ui';ctx.fillStyle='#b9dfff';ctx.fillText(String(i),x+10,y-11)}});
+ if(conectando && primeiro>=0){ctx.fillStyle='#ffdda6';ctx.font='bold 15px system-ui';ctx.fillText('Arraste até outra estrela • passe por várias ou solte para terminar',R.x+10,R.y+25)}
  ctx.font='15px system-ui';ctx.fillStyle='#a3c2d9';ctx.fillText('x = 0,00',R.x,R.y+R.h+26);ctx.fillText('x = 1,00',R.x+R.w-67,R.y+R.h+26);ctx.fillText('y = 0,00 (topo)',R.x,R.y-16);
  $('contagem').textContent=d.pontos.length+' estrelas · '+d.linhas.length+' linhas';}
 function render(){desenharCanvas();atualizaBrilho()}
-function setMode(m){modo=m;primeiro=-1;document.querySelectorAll('[data-mode]').forEach(b=>b.classList.toggle('active',b.dataset.mode===m));render()}
+const dicasModo={
+ mover:'Arraste uma estrela para mudar sua posição. Os traços conectados acompanham o ponto.',
+ adicionar:'Clique em um espaço vazio do céu para adicionar uma estrela. Depois escolha Mover ou Conectar.',
+ conectar:'Pressione uma estrela, mantenha pressionado e arraste até outra. Passe por várias estrelas para criar um caminho inteiro. Solte para terminar.',
+ apagar:'Clique em uma estrela para removê-la, ou clique diretamente em uma linha para apagar só essa conexão.'
+};
+function encerrarInteracao(){conectando=false;arrastando=false;primeiro=-1;posCursor=null;cursorAnterior=null;hover=-1;ponteiroAtivo=null;linhasNovas=0;historicoArrasto=false;canvas.classList.remove('dragging-point')}
+function setMode(m){encerrarInteracao();modo=m;document.querySelectorAll('[data-mode]').forEach(b=>b.classList.toggle('active',b.dataset.mode===m));$('dicaModo').lastElementChild.textContent=dicasModo[m];$('dicaModo').classList.toggle('connect',m==='conectar');canvas.classList.toggle('drag-connect',m==='conectar');canvas.classList.toggle('drag-point',m==='mover');render()}
 document.querySelectorAll('[data-mode]').forEach(b=>b.addEventListener('click',()=>setMode(b.dataset.mode)));
-canvas.addEventListener('pointerdown',e=>{const pos=coordenadas(e),hit=pertoPonto(pos);if(modo==='mover'){sel=hit;if(hit>=0){salvarHistorico();arrastando=true;canvas.setPointerCapture(e.pointerId)}}else if(modo==='adicionar'){salvarHistorico();const [x,y]=normalizar(pos);data().pontos.push([arredondar(x),arredondar(y),1.5]);sel=data().pontos.length-1;notificar('Estrela adicionada! Use Mover para arrastar ou Ligar para conectar.')}else if(modo==='conectar'){if(hit>=0){sel=hit;if(primeiro<0){primeiro=hit}else if(primeiro!==hit){const l=[primeiro,hit],ja=data().linhas.some(a=>(a[0]===l[0]&&a[1]===l[1])||(a[0]===l[1]&&a[1]===l[0]));if(!ja){salvarHistorico();data().linhas.push(l)}primeiro=-1}}}else if(modo==='apagar'){if(hit>=0){salvarHistorico();data().pontos.splice(hit,1);data().linhas=data().linhas.filter(l=>l[0]!==hit&&l[1]!==hit).map(l=>l.map(n=>n>hit?n-1:n));sel=-1;primeiro=-1}else{const k=pertoLinha(pos);if(k>=0){salvarHistorico();data().linhas.splice(k,1)}}}render();gerarGML()});
-canvas.addEventListener('pointermove',e=>{const pos=coordenadas(e),[x,y]=normalizar(pos);info.textContent='Posição: x = '+x.toFixed(3)+'; y = '+y.toFixed(3)+'  |  '+(modo==='conectar'?'Selecione duas estrelas':modo==='adicionar'?'Clique para colocar uma estrela':modo==='apagar'?'Clique em uma estrela ou linha':'Arraste uma estrela para mover');if(arrastando&&sel>=0){data().pontos[sel][0]=arredondar(x);data().pontos[sel][1]=arredondar(y);render();gerarGML()}});
-function fimArrasto(){arrastando=false}
-canvas.addEventListener('pointerup',fimArrasto);canvas.addEventListener('pointercancel',fimArrasto);
+// Uma ligação por trecho; uma ação de arrastar inteira ocupa apenas um passo de Desfazer.
+function conectarAte(destino){
+ if(!conectando || primeiro<0 || destino<0 || destino===primeiro)return;
+ const jaExiste=data().linhas.some(l=>(l[0]===primeiro&&l[1]===destino)||(l[1]===primeiro&&l[0]===destino));
+ if(!jaExiste){
+  if(!historicoArrasto){salvarHistorico();historicoArrasto=true}
+  data().linhas.push([primeiro,destino]);linhasNovas++;
+ }
+ primeiro=destino;
+ sel=destino;
+}
+// Detecta estrelas cruzadas pelo movimento, mesmo quando o cursor pula posições entre eventos.
+function atravessarEstrelas(de,ate){
+ if(!conectando)return;
+ const dx=ate.x-de.x,dy=ate.y-de.y,den=dx*dx+dy*dy;
+ const candidatos=[];
+ data().pontos.forEach((p,i)=>{
+  if(i===primeiro)return;
+  const [x,y]=px(p);
+  const t=den?clamp(((x-de.x)*dx+(y-de.y)*dy)/den,0,1):0;
+  const qx=de.x+t*dx,qy=de.y+t*dy;
+  if(Math.hypot(x-qx,y-qy)<=raioAlvo())candidatos.push({i,t});
+ });
+ candidatos.sort((a,b)=>a.t-b.t);
+ for(const item of candidatos)conectarAte(item.i);
+}
+function atualizarCursor(pos){posCursor=pos;hover=pertoPonto(pos)}
+function interromperArrasto(e,terminou){
+ if(ponteiroAtivo!==e.pointerId)return;
+ if(conectando){
+  if(terminou){const pos=coordenadas(e);atravessarEstrelas(cursorAnterior||pos,pos);atualizarCursor(pos)}
+  const criadas=linhasNovas;
+  encerrarInteracao();
+  if(criadas)notificar(criadas+' conexão(ões) criada(s)! É possível desfazer todo o traçado de uma só vez.');
+  else if(terminou)notificar('Comece em uma estrela e arraste até outra para criar a ligação.');
+ }else{encerrarInteracao()}
+ if(canvas.hasPointerCapture?.(e.pointerId))canvas.releasePointerCapture(e.pointerId);
+ render();gerarGML();
+}
+canvas.addEventListener('pointerdown',e=>{
+ if(e.pointerType==='mouse'&&e.button!==0)return;
+ e.preventDefault();
+ const pos=coordenadas(e),hit=pertoPonto(pos);
+ if(modo==='mover'){
+  sel=hit;
+  if(hit>=0){salvarHistorico();arrastando=true;ponteiroAtivo=e.pointerId;canvas.setPointerCapture(e.pointerId);canvas.classList.add('dragging-point')}
+ }else if(modo==='adicionar'){
+  if(pos.x<R.x||pos.x>R.x+R.w||pos.y<R.y||pos.y>R.y+R.h){notificar('Clique dentro da área de edição para adicionar a estrela.');return}
+  salvarHistorico();const [x,y]=normalizar(pos);data().pontos.push([arredondar(x),arredondar(y),1.5]);sel=data().pontos.length-1;
+  notificar('Estrela adicionada! Posicione com Mover e depois use Conectar arrastando.');
+ }else if(modo==='conectar'){
+  if(hit>=0){
+   primeiro=hit;sel=hit;conectando=true;posCursor=pos;cursorAnterior=pos;hover=hit;ponteiroAtivo=e.pointerId;linhasNovas=0;historicoArrasto=false;
+   canvas.setPointerCapture(e.pointerId);
+  }else{notificar('Para conectar, pressione diretamente sobre uma estrela e arraste até outra.')}
+ }else if(modo==='apagar'){
+  if(hit>=0){salvarHistorico();data().pontos.splice(hit,1);data().linhas=data().linhas.filter(l=>l[0]!==hit&&l[1]!==hit).map(l=>l.map(n=>n>hit?n-1:n));sel=-1}
+  else{const k=pertoLinha(pos);if(k>=0){salvarHistorico();data().linhas.splice(k,1)}}
+ }
+ render();gerarGML();
+});
+canvas.addEventListener('pointermove',e=>{
+ const pos=coordenadas(e),[x,y]=normalizar(pos);
+ info.textContent='Posição: x = '+x.toFixed(3)+'; y = '+y.toFixed(3)+'  |  '+(modo==='conectar'?'Pressione uma estrela e arraste para ligar':modo==='adicionar'?'Clique para colocar uma estrela':modo==='apagar'?'Clique em uma estrela ou linha':'Arraste uma estrela para mover');
+ if(conectando && ponteiroAtivo===e.pointerId){
+  atravessarEstrelas(cursorAnterior||pos,pos);
+  cursorAnterior=pos;atualizarCursor(pos);render();gerarGML();
+ }else if(arrastando && ponteiroAtivo===e.pointerId && sel>=0){
+  data().pontos[sel][0]=arredondar(x);data().pontos[sel][1]=arredondar(y);render();gerarGML();
+ }
+});
+canvas.addEventListener('pointerup',e=>interromperArrasto(e,true));
+canvas.addEventListener('pointercancel',e=>interromperArrasto(e,false));
+canvas.addEventListener('lostpointercapture',e=>{if(ponteiroAtivo===e.pointerId){encerrarInteracao();render();gerarGML()}});
+canvas.addEventListener('pointerleave',()=>{if(!conectando && !arrastando){hover=-1;render()}});
+$('limparlinhas').addEventListener('click',()=>{
+ if(!data().linhas.length){notificar('O desenho já está sem linhas.');return}
+ if(!confirm('Apagar todas as linhas deste desenho? As estrelas serão mantidas e você poderá usar Desfazer.'))return;
+ salvarHistorico();data().linhas=[];encerrarInteracao();render();gerarGML();notificar('Linhas apagadas. Agora reconecte as estrelas arrastando.');
+});
 $('numeros').addEventListener('change',render);
-$('desfazer').addEventListener('click',()=>{if(historico.length){desenhos[escolhido]=historico.pop();primeiro=-1;sel=-1;render();gerarGML();notificar('Alteração desfeita.')}else notificar('Não há alterações para desfazer.')});
+$('desfazer').addEventListener('click',()=>{if(historico.length){desenhos[escolhido]=historico.pop();encerrarInteracao();sel=-1;render();gerarGML();notificar('Alteração desfeita.')}else notificar('Não há alterações para desfazer.')});
 brilho.addEventListener('pointerdown',()=>{if(sel>=0)salvarHistorico()});brilho.addEventListener('input',()=>{if(sel>=0){data().pontos[sel][2]=Number(brilho.value);render();gerarGML()}});
 fase.addEventListener('change',()=>{escolhido=Number(fase.value);carregarCampos();notificar('Desenho carregado. Arraste estrelas para alterar a imagem.')});
 [palavra,nome,subtitulo].forEach(e=>e.addEventListener('input',()=>{data().palavra=asciiPalavra(palavra.value);data().nome=nome.value;data().subtitulo=subtitulo.value;atualizaFases();gerarGML()}));
@@ -102,5 +194,5 @@ $('baixargml').addEventListener('click',()=>{download('constelacao_'+asciiPalavr
 $('salvarjson').addEventListener('click',()=>{download('desenho_'+asciiPalavra(data().palavra)+'.json',JSON.stringify(data(),null,2),'application/json');notificar('Desenho salvo em JSON. Guarde esse arquivo para editar depois.')});
 $('abrirjson').addEventListener('click',()=>$('arquivojson').click());
 $('arquivojson').addEventListener('change',async e=>{const f=e.target.files?.[0];if(!f)return;try{const d=JSON.parse(await f.text());if(!d||typeof d.palavra!=='string'||!Array.isArray(d.pontos)||!Array.isArray(d.linhas)||d.pontos.some(p=>!Array.isArray(p)||p.length!==3||p.some(n=>typeof n!=='number'||!Number.isFinite(n)))||d.linhas.some(l=>!Array.isArray(l)||l.length!==2||l.some(n=>!Number.isInteger(n)||n<0||n>=d.pontos.length)))throw new Error('Arquivo não é um desenho válido.');if(!asciiPalavra(d.palavra))throw new Error('Palavra da fase inválida.');d.palavra=asciiPalavra(d.palavra);d.nome=String(d.nome??d.palavra);d.subtitulo=String(d.subtitulo??'');const k=desenhos.findIndex(x=>x.palavra===d.palavra);if(k>=0){desenhos[k]=d;escolhido=k}else{desenhos.push(d);escolhido=desenhos.length-1}carregarCampos();notificar('Desenho importado. Você pode voltar a editar normalmente.')}catch(err){notificar('Erro ao abrir: '+err.message)}e.target.value=''});
-carregarCampos();
+setMode('mover');carregarCampos();
 </script></body></html>
